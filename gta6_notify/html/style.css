@@ -1,0 +1,93 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+
+#root {
+    --u: calc(100vh / 1080 * var(--scale, 1));
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #fff;
+}
+
+.stack { position: absolute; display: flex; flex-direction: column; width: min(calc(940 * var(--u)), 86vw); }
+.stack[data-pos="top-left"] { top: calc(48 * var(--u)); left: calc(96 * var(--u)); }
+.stack[data-pos="top-center"] { top: calc(48 * var(--u)); left: 50%; margin-left: calc(-0.5 * min(calc(940 * var(--u)), 86vw)); }
+.stack[data-pos="top-right"] { top: calc(48 * var(--u)); right: calc(96 * var(--u)); }
+.stack[data-pos="left-center"] { top: 50%; left: calc(96 * var(--u)); transform: translateY(-50%); }
+.stack[data-pos="center"] { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.stack[data-pos="right-center"] { top: 50%; right: calc(96 * var(--u)); transform: translateY(-50%); }
+.stack[data-pos="bottom-left"] { bottom: calc(48 * var(--u)); left: calc(96 * var(--u)); }
+.stack[data-pos="bottom-center"] { bottom: calc(48 * var(--u)); left: 50%; margin-left: calc(-0.5 * min(calc(940 * var(--u)), 86vw)); }
+.stack[data-pos="bottom-right"] { bottom: calc(48 * var(--u)); right: calc(96 * var(--u)); }
+
+.slot { padding-bottom: calc(20 * var(--u)); transition: height 0.28s ease, padding 0.28s ease; }
+.stack[data-pos^="bottom"] .slot { padding-bottom: 0; padding-top: calc(20 * var(--u)); }
+.slot.collapse { height: 0 !important; padding: 0 !important; overflow: hidden; }
+
+.note { display: flex; align-items: stretch; }
+.disc {
+    height: auto;
+    aspect-ratio: 1 / 1;
+    flex: none;
+    margin-right: calc(22 * var(--u));
+    border-radius: 50%;
+    background: #070609;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 calc(12 * var(--u)) calc(30 * var(--u)) rgba(0, 0, 0, 0.53);
+    z-index: 2;
+}
+.disc { position: relative; }
+.disc img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.body {
+    position: relative;
+    flex: 1;
+    min-height: calc(108 * var(--u));
+    padding: calc(14 * var(--u)) calc(25 * var(--u)) calc(16 * var(--u)) calc(30 * var(--u));
+    background: rgba(17, 16, 20, 0.9);
+    box-shadow: 0 calc(14 * var(--u)) calc(30 * var(--u)) rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.body::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: calc(11 * var(--u)); background: var(--accent); transform-origin: top; }
+#root.paused { visibility: hidden; }
+.label { display: flex; justify-content: space-between; align-items: baseline; gap: calc(12 * var(--u)); font-size: var(--fs-label, calc(12 * var(--u))); letter-spacing: calc(1.8 * var(--u)); text-transform: uppercase; opacity: 0.48; margin-bottom: calc(5 * var(--u)); }
+.label .count { color: var(--accent); font-weight: 700; letter-spacing: 0; }
+.note.bump { animation: bump 0.25s ease-out; }
+@keyframes bump { 50% { transform: scale(1.025); } }
+.message { font-size: var(--fs-msg, calc(29 * var(--u))); line-height: 1.2; font-weight: 800; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); overflow-wrap: anywhere; }
+
+.note.in { animation-duration: 0.45s; animation-timing-function: cubic-bezier(0.2, 0.9, 0.25, 1.15); animation-fill-mode: both; }
+.note.in.from-right { animation-name: in-right; }
+.note.in.from-left { animation-name: in-left; }
+.note.in.from-top { animation-name: in-top; }
+.note.in.from-bottom { animation-name: in-bottom; }
+.note.in.from-center { animation-name: in-center; }
+.note.in .disc { animation: pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) 0.1s both; }
+.note.live .body::before { animation: draw 0.4s ease-out both, drain var(--dur, 6000ms) linear 0.45s forwards; }
+.note.in .label, .note.in .message { animation: text-in 0.4s ease-out 0.08s both; }
+
+.note.out { animation-duration: 0.3s; animation-timing-function: ease-in; animation-fill-mode: forwards; }
+.note.out.from-right { animation-name: out-right; }
+.note.out.from-left { animation-name: out-left; }
+.note.out.from-top { animation-name: out-top; }
+.note.out.from-bottom { animation-name: out-bottom; }
+.note.out.from-center { animation-name: out-center; }
+.note.out .body::before { transform: scaleY(0); }
+
+@keyframes in-right { from { opacity: 0; transform: translateX(calc(60 * var(--u))); } to { opacity: 1; transform: none; } }
+@keyframes in-left { from { opacity: 0; transform: translateX(calc(-60 * var(--u))); } to { opacity: 1; transform: none; } }
+@keyframes in-top { from { opacity: 0; transform: translateY(calc(-40 * var(--u))); } to { opacity: 1; transform: none; } }
+@keyframes in-bottom { from { opacity: 0; transform: translateY(calc(40 * var(--u))); } to { opacity: 1; transform: none; } }
+@keyframes in-center { from { opacity: 0; transform: scale(0.88); filter: blur(6px); } to { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes out-right { to { opacity: 0; transform: translateX(calc(50 * var(--u))) scale(0.97); } }
+@keyframes out-left { to { opacity: 0; transform: translateX(calc(-50 * var(--u))) scale(0.97); } }
+@keyframes out-top { to { opacity: 0; transform: translateY(calc(-30 * var(--u))) scale(0.97); } }
+@keyframes out-bottom { to { opacity: 0; transform: translateY(calc(30 * var(--u))) scale(0.97); } }
+@keyframes out-center { to { opacity: 0; transform: scale(0.9); filter: blur(6px); } }
+@keyframes pop { from { transform: scale(0.55); } 70% { transform: scale(1.08); } to { transform: scale(1); } }
+@keyframes draw { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes drain { from { transform: scaleY(1); } to { transform: scaleY(0); } }
+@keyframes text-in { from { opacity: 0; transform: translateX(calc(-10 * var(--u))); } to { opacity: 1; transform: none; } }

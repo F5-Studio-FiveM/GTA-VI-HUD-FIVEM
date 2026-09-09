@@ -1,0 +1,55 @@
+@font-face { font-family: "Pricedown Bl"; src: url("fonts/Pricedown-Bl.woff") format("woff"); font-weight: 900; font-style: normal; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+[hidden] { display: none !important; }
+
+#root {
+    --u: calc(100vh / 1080);
+    --top: 3vh;
+    --right: calc(38.4 * var(--u));
+    --text: #f7f7f7;
+    --muted: rgba(247, 247, 247, 0.42);
+    --danger: #ff4d6d;
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    font-family: "Pricedown Bl", Impact, "Segoe UI", sans-serif;
+    font-weight: 900;
+    color: var(--text);
+    pointer-events: none;
+}
+#root.paused { visibility: hidden; }
+
+.weapon {
+    position: absolute;
+    top: var(--top);
+    right: var(--right);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: calc(4 * var(--u));
+    animation: fadein 0.15s ease-out;
+}
+.ammo {
+    display: flex;
+    align-items: baseline;
+    gap: calc(14 * var(--u));
+    line-height: 1;
+    transform: scaleY(0.85);
+    transform-origin: bottom right;
+    -webkit-text-stroke: var(--u) rgba(0, 0, 0, 0.65);
+    text-shadow: 0 var(--u) calc(2 * var(--u)) rgba(0, 0, 0, 0.6);
+}
+.clip { font-size: calc(32 * var(--u)); }
+.clip.empty { color: var(--danger); }
+.reserve { font-size: calc(32 * var(--u)); color: var(--muted); }
+.icon {
+    height: calc(52 * var(--u));
+    max-width: calc(156 * var(--u));
+    object-fit: contain;
+    object-position: right center;
+    filter: drop-shadow(0 var(--u) calc(2 * var(--u)) rgba(0, 0, 0, 0.55));
+}
+.icon.swap { animation: fadein 0.15s ease-out; }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
