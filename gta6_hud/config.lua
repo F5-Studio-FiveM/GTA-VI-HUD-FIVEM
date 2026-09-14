@@ -1,7 +1,9 @@
 Config = {}
 Config.OpenMenu = 'I'
 Config.StressChance = 0.1
-Config.UseMPH = true
+
+Config.MeasurementSystem = 'metric' -- 'metric' | 'imperial'
+
 Config.MinimumStress = 50
 Config.MinimumSpeedUnbuckled = 50
 Config.MinimumSpeed = 100
@@ -17,7 +19,6 @@ Config.ShowZone = true
 Config.ShowNavigation = true
 
 Config.Locale = 'en'
-Config.NavUnits = 'imperial'
 
 Config.WhitelistedWeaponArmed = {
     [`weapon_petrolcan`] = true,

@@ -40,6 +40,30 @@ function HUD.IsDead()
     return false
 end
 
+function HUD.IsMetric()
+    if Config.MeasurementSystem == 'imperial' then
+        return false
+    end
+    if Config.MeasurementSystem == 'metric' then
+        return true
+    end
+    if Config.NavUnits == 'metric' or Config.UseMPH == false then
+        return true
+    end
+    return false
+end
+
+function HUD.GetSpeedUnit()
+    if HUD.IsMetric() then
+        return Config.SpeedUnit or 'KMH'
+    end
+    return 'MPH'
+end
+
+function HUD.GetSpeedMultiplier()
+    return HUD.IsMetric() and 3.6 or 2.23694
+end
+
 function HUD.Notify(text, ntype, length)
     if GetResourceState('gta6_notify') == 'started' then
         return exports.gta6_notify:Notify(text, ntype, length)
@@ -124,7 +148,7 @@ function HUD.ApplySettings()
     loadSettings(ok and type(decoded) == 'table' and decoded or Config.Menu)
     SendNUIMessage({
         action = 'config',
-        unit = Config.UseMPH and 'MPH' or 'KMH',
+        unit = HUD.GetSpeedUnit(),
         fullHealthInVehicle = Config.ShowFullHealthInVehicle == true,
         vehicleHealthTimeout = Config.VehicleHealthTimeout,
         vehicleHealthLow = Config.VehicleHealthLow,
@@ -132,11 +156,13 @@ function HUD.ApplySettings()
         statusAlways = Config.ShowStatusAlways == true,
         locale = Config.Locale,
         nav = localeGroup('nav_', NAV_KEYS),
-        navUnits = Config.NavUnits,
+        navUnits = HUD.IsMetric() and 'metric' or 'imperial',
         menu = menuText(),
     })
-    Wait(500)
-    TriggerEvent('hud:client:LoadMap')
+    CreateThread(function()
+        Wait(500)
+        TriggerEvent('hud:client:LoadMap')
+    end)
 end
 
 local function resetCaches()
@@ -266,4 +292,12 @@ CreateThread(function()
             Wait(250)
         end
     end
+end)
+
+AddEventHandler('onClientResourceStart', function(resourceName)
+    if resourceName ~= GetCurrentResourceName() then return end
+    CreateThread(function()
+        Wait(500)
+        HUD.ApplySettings()
+    end)
 end)

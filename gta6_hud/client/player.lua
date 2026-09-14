@@ -83,6 +83,8 @@ local function updateVehicleHud(data)
         zone = data[10],
         navDir = data[11],
         navDist = data[12],
+        unit = data[13],
+        navUnits = data[14],
     })
 end
 
@@ -196,7 +198,7 @@ CreateThread(function()
             if inVehicle then
                 engine = GetVehicleEngineHealth(vehicle) / 10
                 if engine ~= engine then engine = 0 end
-                speed = math.ceil(GetEntitySpeed(vehicle) * speedMultiplier)
+                speed = math.ceil(GetEntitySpeed(vehicle) * (HUD.GetSpeedMultiplier and HUD.GetSpeedMultiplier() or 3.6))
             end
             DisplayRadar(HUD.Cinematic == 0 and ((inVehicle and not menu.isHideMapChecked) or (not inVehicle and menu.isOutMapChecked)))
             updatePlayerHud({
@@ -244,6 +246,8 @@ CreateThread(function()
                     getZoneName(ped),
                     navDir,
                     navDist,
+                    HUD.GetSpeedUnit and HUD.GetSpeedUnit() or 'KMH',
+                    HUD.IsMetric and (HUD.IsMetric() and 'metric' or 'imperial') or 'metric',
                 })
             elseif wasInVehicle then
                 wasInVehicle = false

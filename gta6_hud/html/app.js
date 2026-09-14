@@ -1,5 +1,5 @@
 const RESOURCE = typeof GetParentResourceName === 'function' ? GetParentResourceName() : 'gta6_hud';
-const SPEED_UNIT = 'MPH';
+let speedUnit = 'KMPH';
 const VEHICLE_NAME_MS = 3500;
 const DEG_PER_U = 4 / 3;
 
@@ -144,7 +144,7 @@ function hit(id, value) {
 
 STATS.forEach((s) => $('#status').appendChild(makeRow(s)));
 VEHICLE_ROWS.forEach((s) => $('#vehicle-rows').appendChild(makeRow(s)));
-$('#speed-unit').textContent = SPEED_UNIT;
+$('#speed-unit').textContent = speedUnit;
 
 const hud = $('#hud');
 const player = {};
@@ -402,6 +402,13 @@ function onCar(data) {
     }
 
     setSpeed(num(vehicle.speed));
+    if (vehicle.unit) {
+        speedUnit = vehicle.unit;
+    }
+    if (vehicle.navUnits) {
+        navUnits = vehicle.navUnits;
+    }
+    $('#speed-unit').textContent = speedUnit;
     $('#altitude-row').hidden = !vehicle.showAltitude;
     $('#altitude').textContent = Math.round(num(vehicle.altitude));
     $('#vehicle-make').textContent = vehicle.make || '';
@@ -590,7 +597,10 @@ window.addEventListener('message', (e) => {
         case 'setting': onSetting(data.key, data.value); break;
         case 'open': menu.hidden = false; syncMenuInputs(); break;
         case 'config':
-            $('#speed-unit').textContent = data.unit || SPEED_UNIT;
+            if (data.unit) {
+                speedUnit = data.unit;
+                $('#speed-unit').textContent = data.unit;
+            }
             fullHealthInVehicle = !!data.fullHealthInVehicle;
             vehicleHealthTimeout = num(data.vehicleHealthTimeout, 6000);
             vehicleHealthLow = num(data.vehicleHealthLow, 50);
@@ -605,4 +615,14 @@ window.addEventListener('message', (e) => {
 });
 
 applyMapClasses();
-post('nuiReady');
+
+function sendNuiReady() {
+    fetch(`https://${RESOURCE}/nuiReady`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}'
+    }).catch(() => {
+        setTimeout(sendNuiReady, 1000);
+    });
+}
+sendNuiReady();

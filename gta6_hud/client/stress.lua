@@ -9,7 +9,7 @@ CreateThread(function()
             if IsPedInAnyVehicle(ped, false) then
                 local veh = GetVehiclePedIsIn(ped, false)
                 local vehClass = GetVehicleClass(veh)
-                local speed = GetEntitySpeed(veh) * speedMultiplier
+                local speed = GetEntitySpeed(veh) * (HUD.GetSpeedMultiplier and HUD.GetSpeedMultiplier() or speedMultiplier)
                 if Config.VehClassStress[tostring(vehClass)] and not Config.WhitelistedVehicles[GetEntityModel(veh)] then
                     local stressSpeed = Config.MinimumSpeed
                     if vehClass ~= 8 and not HUD.Data.seatbelt then
