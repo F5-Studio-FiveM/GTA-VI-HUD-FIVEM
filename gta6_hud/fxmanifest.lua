@@ -3,7 +3,7 @@ game 'gta5'
 lua54 'yes'
 author 'F5 Studio <https://f5stud.io>'
 description 'GTA VI style HUD for QBCore, Qbox and ESX'
-version '1.0.0'
+version '1.1.0'
 
 shared_scripts {
     'config.lua',
